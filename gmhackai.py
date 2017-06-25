@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[16]:
 
 import pandas as pd
 import numpy as np
@@ -18,7 +18,7 @@ key = 'AIzaSyCsr6LZaIvS7F6ZrcmEHZ3DwnU5UlRTcRo'
 gmaps.configure(api_key=key)
 
 
-# In[ ]:
+# In[17]:
 
 factor_price = False
 factor_space = False
@@ -26,7 +26,9 @@ factor_space = False
 # traffic condition
 
 
-# In[2]:
+# ## Pulling Green P Parking Data
+
+# In[18]:
 
 print("Pulling Greeen P Parking data from City of Toronto ...")
 sleep(0.5)
@@ -51,12 +53,14 @@ fig_plocations.add_layer(park_markers)
 
 # ## Green P Parking Spots
 
-# In[3]:
+# In[19]:
 
 fig_plocations
 
 
-# In[ ]:
+# ## Finding Clusters of Parking Locations
+
+# In[21]:
 
 if factor_price:
     park_features = c = np.c_[(lat,lng, price)]
@@ -97,7 +101,7 @@ sleep(0.5)
 kmeans = KMeans(n_clusters=4, random_state=0).fit(X)
 Xmean = kmeans.cluster_centers_
 for i in tqdm(range(100)):
-    sleep(0.02)
+    sleep(0.01)
 print("successfully identified 4 clusters")
 print("\n")
 
@@ -113,12 +117,14 @@ fig_hm_cnt.add_layer(Xm_sym)
 
 # ## Clusters of Historical User Locations
 
-# In[ ]:
+# In[22]:
 
 fig_hm_cnt
 
 
-# In[ ]:
+# ## Finding Optimum Parking Spots
+
+# In[23]:
 
 print("Fidnding the best parking spot for you ...")
 nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(park_features)
@@ -152,10 +158,12 @@ fig_opt.add_layer(opt_markers)
 
 # ## Optimum Parking Spots
 
-# In[1]:
+# In[24]:
 
 fig_opt
 
+
+# ## Notifying the User
 
 # In[3]:
 
@@ -169,13 +177,10 @@ auth_token = "#"
 client = TwilioRestClient(account_sid, auth_token)
 
 location = '250 Dundas W'
-message = client.messages.create(to='6478715005', from_="+16479311112", body='I found you parking at ' + location )
+cluster = "work"
+cluster_num = park_opt_id[0]
+location = parks[cluster_num]['address']
+msg = "I found you parking near " + cluster + " at " + location
 
+message = client.messages.create(to='6478715005', from_="+16479311112", body=msg)
 
-# - History of parking spots
-# - User's perferences - price vs convinience
-# - rain
-# - busy periods
-# 
-# - Motivations change based on hour: family oriented, work oriented
-# - 
