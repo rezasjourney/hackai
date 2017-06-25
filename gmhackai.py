@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[32]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
@@ -14,11 +14,11 @@ from sklearn.neighbors import NearestNeighbors
 
 import gmaps
 
-key = 'AIzaSyCsr6LZaIvS7F6ZrcmEHZ3DwnU5UlRTcRo'
+key = '#'
 gmaps.configure(api_key=key)
 
 
-# In[33]:
+# In[9]:
 
 factor_price = False
 factor_space = False
@@ -28,7 +28,7 @@ factor_space = False
 
 # ## Pulling Green P Parking Data
 
-# In[34]:
+# In[3]:
 
 print("Pulling Greeen P Parking data from City of Toronto ...")
 sleep(0.5)
@@ -53,15 +53,16 @@ fig_plocations.add_layer(park_markers)
 
 # ## Green P Parking Spots
 
-# In[19]:
+# In[4]:
 
 fig_plocations
 
 
 # ## Finding Clusters of Parking Locations
 
-# In[35]:
+# In[10]:
 
+park_features = c = np.c_[(lat,lng)]
 if factor_price:
     park_features = c = np.c_[(lat,lng, price)]
 if factor_space:
@@ -96,12 +97,12 @@ if factor_price:
 if factor_space:
     X = np.column_stack((X, np.zeros((len(X), 2))))
     
-print("Identifying clusters of user's historial parking data")
+print("Identifying clusters based on user's historial parking data")
 sleep(0.5)
 kmeans = KMeans(n_clusters=4, random_state=0).fit(X)
 Xmean = kmeans.cluster_centers_
 for i in tqdm(range(100)):
-    sleep(0.01)
+    sleep(0.02)
 print("successfully identified 4 clusters")
 print("\n")
 
@@ -117,86 +118,78 @@ fig_hm_cnt.add_layer(Xm_sym)
 
 # ## Clusters of Historical User Locations
 
-# In[22]:
+# In[6]:
 
 fig_hm_cnt
 
 
 # ## Finding Optimum Parking Spots
 
-# In[36]:
+# In[11]:
 
 print("Fidnding the best parking spot for you ...")
 nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(park_features)
 distances, indices = nbrs.kneighbors(Xmean)
 print("\n")
 
-if factor_price:
-    num_park_spots = 3
-else:
-    num_park_spots = 4
-for i in range(num_park_spots):   
-    print("Found a parking spot")
-    sleep(0.5)
-sleep(2)
-print("\n")
-print("All parking spots are identified")
-print("\n")
-
 park_opt_id = indices.flatten()
 park_opt = park_features[park_opt_id][:,:2]
 opt_markers = gmaps.marker_layer(park_opt)
 
-fig_opt = gmaps.figure()
-fig_opt.add_layer(X1_hm)
-fig_opt.add_layer(X2_hm)
-fig_opt.add_layer(X3_hm)
-fig_opt.add_layer(X4_hm)
-fig_opt.add_layer(Xm_sym)
-fig_opt.add_layer(opt_markers)
+if factor_price:
+    num_park_spots = 3
+    fig_opt_p = gmaps.figure()
+    fig_opt_p.add_layer(X1_hm)
+    fig_opt_p.add_layer(X2_hm)
+    fig_opt_p.add_layer(X3_hm)
+    fig_opt_p.add_layer(X4_hm)
+    fig_opt_p.add_layer(Xm_sym)
+    fig_opt_p.add_layer(opt_markers)
+else:
+    num_park_spots = 4
+    fig_opt_np = gmaps.figure()
+    fig_opt_np.add_layer(X1_hm)
+    fig_opt_np.add_layer(X2_hm)
+    fig_opt_np.add_layer(X3_hm)
+    fig_opt_np.add_layer(X4_hm)
+    fig_opt_np.add_layer(Xm_sym)
+    fig_opt_np.add_layer(opt_markers)
+
+for i in range(num_park_spots):   
+    print("Found a parking spot")
+    sleep(0.5)
+sleep(2)
+
+print("\n")
+print("All parking spots are identified")
+print("\n")
 
 
 # ## Optimum Parking Spots
 
-# In[24]:
+# In[13]:
 
-fig_opt
+fig_opt_p
+
+
+# In[12]:
+
+fig_opt_np
 
 
 # ## Notifying the User
 
-# In[3]:
-
-from twilio.rest import TwilioRestClient
-
-# Find these values at https://twilio.com/user/account
-account_sid = "#"
-
-auth_token = "#"
-
-client = TwilioRestClient(account_sid, auth_token)
-
-location = '250 Dundas W'
-cluster = "work"
-cluster_num = park_opt_id[0]
-location = parks[cluster_num]['address']
-msg = "I found you parking near " + cluster + " at " + location
-
-message = client.messages.create(to='6478715005', from_="+16479311112", body=msg)
-
-
-# In[37]:
+# In[13]:
 
 from twilio.rest import Client
 
 # Your Account SID from twilio.com/console
-account_sid = "ACfa926828b60cb58ce5f89767a99fdbec"
+account_sid = "#"
 # Your Auth Token from twilio.com/console
-auth_token  = "0a1976c64cb36ba040ad88f79775dc64"
+auth_token  = "#"
 
 client = Client(account_sid, auth_token)
 
-location = '250 Dundas W'
 cluster = "work"
 cluster_num = park_opt_id[0]
 location = parks[cluster_num]['address']
@@ -208,4 +201,9 @@ message = client.messages.create(
     body=msg)
 
 print(message.sid)
+
+
+# In[ ]:
+
+
 
