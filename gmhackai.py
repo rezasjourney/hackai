@@ -163,9 +163,8 @@ from twilio.rest import TwilioRestClient
 
 # Find these values at https://twilio.com/user/account
 account_sid = "#"
-#ACd549eda841e9da630474babce39110ea"
+
 auth_token = "#"
-#20a389d4fcd277b65838ae8f04bec182"
 
 client = TwilioRestClient(account_sid, auth_token)
 
