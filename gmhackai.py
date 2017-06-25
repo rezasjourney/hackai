@@ -18,6 +18,14 @@ key = 'AIzaSyCsr6LZaIvS7F6ZrcmEHZ3DwnU5UlRTcRo'
 gmaps.configure(api_key=key)
 
 
+# In[ ]:
+
+factor_price = False
+factor_space = False
+# indoor/outdoor - weather
+# traffic condition
+
+
 # In[2]:
 
 print("Pulling Greeen P Parking data from City of Toronto ...")
@@ -49,11 +57,6 @@ fig_plocations
 
 
 # In[ ]:
-
-factor_price = False
-factor_space = False
-# indoor/outdoor - weather
-# traffic condition
 
 if factor_price:
     park_features = c = np.c_[(lat,lng, price)]
@@ -107,6 +110,16 @@ fig_hm_cnt.add_layer(X3_hm)
 fig_hm_cnt.add_layer(X4_hm)
 fig_hm_cnt.add_layer(Xm_sym)
 
+
+# ## Clusters of Historical User Locations
+
+# In[ ]:
+
+fig_hm_cnt
+
+
+# In[ ]:
+
 print("Fidnding the best parking spot for you ...")
 nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(park_features)
 distances, indices = nbrs.kneighbors(Xmean)
@@ -137,18 +150,27 @@ fig_opt.add_layer(Xm_sym)
 fig_opt.add_layer(opt_markers)
 
 
-# ## Clusters of Historical User Locations
-
-# In[ ]:
-
-fig_hm_cnt
-
-
 # ## Optimum Parking Spots
 
-# In[ ]:
+# In[1]:
 
 fig_opt
+
+
+# In[3]:
+
+from twilio.rest import TwilioRestClient
+
+# Find these values at https://twilio.com/user/account
+account_sid = "#"
+#ACd549eda841e9da630474babce39110ea"
+auth_token = "#"
+#20a389d4fcd277b65838ae8f04bec182"
+
+client = TwilioRestClient(account_sid, auth_token)
+
+location = '250 Dundas W'
+message = client.messages.create(to='6478715005', from_="+16479311112", body='I found you parking at ' + location )
 
 
 # - History of parking spots
