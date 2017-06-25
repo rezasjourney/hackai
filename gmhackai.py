@@ -1,10 +1,13 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
+
+from tqdm import tqdm
+from time import sleep
 
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
@@ -15,20 +18,15 @@ key = 'AIzaSyCsr6LZaIvS7F6ZrcmEHZ3DwnU5UlRTcRo'
 gmaps.configure(api_key=key)
 
 
-# In[3]:
+# In[2]:
 
+print("Pulling Greeen P Parking data from City of Toronto ...")
+sleep(0.5)
 df = pd.read_json("greenPParking2015.json")
-
-
-# In[14]:
-
-factor_price = False
-factor_space = False
-# indoor/outdoor - weather
-# traffic condition
-
-
-# In[15]:
+for i in tqdm(range(100)):
+    sleep(0.01)
+print("Data successfully collected from 206.130.170.39")
+print("\n")
 
 parks = df.carparks
 lat = [float(p['lat']) for p in parks]
@@ -36,6 +34,26 @@ lng = [float(p['lng']) for p in parks]
 price = [float(p['rate_half_hour']) for p in parks]
 
 park_features = c = np.c_[(lat,lng)]
+
+park_locations = park_features[:,:2]
+park_markers = gmaps.marker_layer(park_locations)
+fig_plocations = gmaps.figure()
+fig_plocations.add_layer(park_markers)
+
+
+# ## Green P Parking Spots
+
+# In[3]:
+
+fig_plocations
+
+
+# In[ ]:
+
+factor_price = False
+factor_space = False
+# indoor/outdoor - weather
+# traffic condition
 
 if factor_price:
     park_features = c = np.c_[(lat,lng, price)]
@@ -55,11 +73,6 @@ X2 = np.load('X2.npy')
 X3 = np.load('X3.npy')
 X4 = np.load('X4.npy')
 
-park_locations = park_features[:,:2]
-park_markers = gmaps.marker_layer(park_locations)
-fig_plocations = gmaps.figure()
-fig_plocations.add_layer(park_markers)
-
 X1_hm = gmaps.heatmap_layer(X1)
 X2_hm = gmaps.heatmap_layer(X2)
 X3_hm = gmaps.heatmap_layer(X3)
@@ -76,8 +89,14 @@ if factor_price:
 if factor_space:
     X = np.column_stack((X, np.zeros((len(X), 2))))
     
+print("Identifying clusters of user's historial parking data")
+sleep(0.5)
 kmeans = KMeans(n_clusters=4, random_state=0).fit(X)
 Xmean = kmeans.cluster_centers_
+for i in tqdm(range(100)):
+    sleep(0.02)
+print("successfully identified 4 clusters")
+print("\n")
 
 Xm = Xmean[:,:2]
 Xm_sym = gmaps.symbol_layer(Xm, fill_color='black', scale=2)
@@ -88,8 +107,22 @@ fig_hm_cnt.add_layer(X3_hm)
 fig_hm_cnt.add_layer(X4_hm)
 fig_hm_cnt.add_layer(Xm_sym)
 
+print("Fidnding the best parking spot for you ...")
 nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(park_features)
 distances, indices = nbrs.kneighbors(Xmean)
+print("\n")
+
+if factor_price:
+    num_park_spots = 3
+else:
+    num_park_spots = 4
+for i in range(num_park_spots):   
+    print("Found a parking spot")
+    sleep(0.5)
+sleep(2)
+print("\n")
+print("All parking spots are identified")
+print("\n")
 
 park_opt_id = indices.flatten()
 park_opt = park_features[park_opt_id][:,:2]
@@ -104,22 +137,16 @@ fig_opt.add_layer(Xm_sym)
 fig_opt.add_layer(opt_markers)
 
 
-# In[10]:
+# ## Clusters of Historical User Locations
 
-fig_plocations
-
-
-# In[11]:
-
-fig_hm
-
-
-# In[12]:
+# In[ ]:
 
 fig_hm_cnt
 
 
-# In[16]:
+# ## Optimum Parking Spots
+
+# In[ ]:
 
 fig_opt
 
@@ -128,3 +155,6 @@ fig_opt
 # - User's perferences - price vs convinience
 # - rain
 # - busy periods
+# 
+# - Motivations change based on hour: family oriented, work oriented
+# - 
