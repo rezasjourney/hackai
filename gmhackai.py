@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[16]:
+# In[32]:
 
 import pandas as pd
 import numpy as np
@@ -18,7 +18,7 @@ key = 'AIzaSyCsr6LZaIvS7F6ZrcmEHZ3DwnU5UlRTcRo'
 gmaps.configure(api_key=key)
 
 
-# In[17]:
+# In[33]:
 
 factor_price = False
 factor_space = False
@@ -28,7 +28,7 @@ factor_space = False
 
 # ## Pulling Green P Parking Data
 
-# In[18]:
+# In[34]:
 
 print("Pulling Greeen P Parking data from City of Toronto ...")
 sleep(0.5)
@@ -60,7 +60,7 @@ fig_plocations
 
 # ## Finding Clusters of Parking Locations
 
-# In[21]:
+# In[35]:
 
 if factor_price:
     park_features = c = np.c_[(lat,lng, price)]
@@ -124,7 +124,7 @@ fig_hm_cnt
 
 # ## Finding Optimum Parking Spots
 
-# In[23]:
+# In[36]:
 
 print("Fidnding the best parking spot for you ...")
 nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(park_features)
@@ -183,4 +183,29 @@ location = parks[cluster_num]['address']
 msg = "I found you parking near " + cluster + " at " + location
 
 message = client.messages.create(to='6478715005', from_="+16479311112", body=msg)
+
+
+# In[37]:
+
+from twilio.rest import Client
+
+# Your Account SID from twilio.com/console
+account_sid = "ACfa926828b60cb58ce5f89767a99fdbec"
+# Your Auth Token from twilio.com/console
+auth_token  = "0a1976c64cb36ba040ad88f79775dc64"
+
+client = Client(account_sid, auth_token)
+
+location = '250 Dundas W'
+cluster = "work"
+cluster_num = park_opt_id[0]
+location = parks[cluster_num]['address']
+msg = "I found you parking near " + cluster + " at " + location
+
+message = client.messages.create(
+    to="6478715005",
+    from_="+16479311112",
+    body=msg)
+
+print(message.sid)
 
